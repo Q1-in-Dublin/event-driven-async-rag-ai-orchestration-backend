@@ -26,7 +26,7 @@ class Result(Base):
     request_id = Column(UUID(as_uuid=True), ForeignKey("requests.id"), nullable=False)
     llm_response = Column(Text, nullable=False)
     # can be null
-    retreived_doc_ids = Column(ARRAY(UUID(as_uuid=True)), nullable= True)
+    retrieved_doc_ids = Column(ARRAY(UUID(as_uuid=True)), nullable=True)
     created_at = Column(DateTime(timezone=True),server_default=func.now())
 
 

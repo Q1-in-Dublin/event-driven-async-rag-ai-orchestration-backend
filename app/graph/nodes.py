@@ -4,6 +4,8 @@ from app.rag.embedding import generate_embedding
 from app.rag.vector_search import search_similar_documents
 
 from app.llm.vertex_client import generate_response
+from app.db.models import Request, Result
+
 RAG_KEYWORDS = [
     "정책", "규정", "가이드", "휴가", "보안", "복지", "문서",
     "policy", "guideline", "regulation", "vacation", "security", "benefits", "document",
@@ -41,3 +43,24 @@ def build_prompt(state: GraphState) -> GraphState:
 def call_llm(state: GraphState) -> GraphState:
     response = generate_response(state["prompt"])
     return {**state, "llm_response": response}
+
+
+def save_result(state:GraphState) -> GraphState:
+    db = SessionLocal()
+    try :
+        request = db.query(Request).filter(Request.id == state["request_id"]).first()
+        if request:
+            request.status = "done"
+
+        result = Result(
+            request_id = state["request_id"],
+            llm_response = state["llm_response"],
+            retrieved_doc_ids = state.get("retrieved_doc_ids") or None,
+
+        )
+        db.add(result)
+        db.commit()
+
+    finally:
+        db.close()
+    return state
