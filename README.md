@@ -54,7 +54,7 @@ flowchart TD
 
 - [x] Project skeleton — FastAPI + Redis + Postgres/pgvector via Docker Compose
 - [x] Database models — `requests`, `results`, `retry_log`, `documents` (pgvector) tables
-- [ ] Queue — Redis List producer/consumer
+- [x] Queue — Redis List producer/consumer
 - [ ] LangGraph orchestration (intent classification → RAG branch → LLM call)
 - [ ] RAG (embedding generation + pgvector search)
 - [ ] LLM client (Vertex AI)
