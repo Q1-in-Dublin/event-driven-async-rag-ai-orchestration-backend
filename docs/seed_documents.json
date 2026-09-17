@@ -1,0 +1,36 @@
+[
+    {
+        "id": "doc-001",
+        "content": "Vacation Policy\n\nAll employees receive 15 days of paid time off (PTO) per year, accrued from their start date, with an additional day added each year starting from year 3, up to a maximum of 25 days. Time off requires manager approval at least 3 business days in advance, and any leave of 5 or more consecutive days must be requested at least 2 weeks ahead. Up to 5 unused PTO days may be carried over to the following year; any remainder is forfeited. Employees also receive 10 separate sick days per year, with extensions available upon submission of a medical certificate. Parental leave is available for up to 12 months in accordance with applicable law.",
+        "metadata": { "source": "HR Policy Handbook", "category": "vacation", "last_updated": "2026-01-15" }
+    },
+    {
+        "id": "doc-002",
+        "content": "Information Security Policy\n\nTwo-factor authentication (2FA) is required for access to all internal systems. Company laptops are configured with full-disk encryption by default, which employees may not disable. Uploading customer data or source code to personal cloud storage (personal Google Drive, Dropbox, etc.) is prohibited; only approved internal storage may be used. Accessing internal systems from external meetings or public locations without VPN is not permitted. Any suspected security incident must be reported immediately in the #security-incident channel; failure to report within 24 hours may result in disciplinary action under separate policy.",
+        "metadata": { "source": "Security & Compliance Guide", "category": "security", "last_updated": "2026-02-01" }
+    },
+    {
+        "id": "doc-003",
+        "content": "Remote Work Policy\n\nDepending on role, employees are generally expected to work from the office at least 3 days per week, with the remaining days available for remote work. Fully remote arrangements are permitted only for designated roles with manager and HR approval. While working remotely, employees are expected to remain responsive on Slack and attend meetings during core hours (9 AM - 6 PM). Remote work from abroad is allowed for up to 30 days with advance notice; longer periods require separate approval due to tax and visa considerations.",
+        "metadata": { "source": "Workplace Flexibility Guide", "category": "remote_work", "last_updated": "2026-01-20" }
+    },
+    {
+        "id": "doc-004",
+        "content": "Employee Benefits\n\nAll employees receive health, dental, and life insurance, with the company covering 90% of premiums. A professional development allowance of up to $1,000,000 KRW (approx.) per year is available for books, online courses, and conferences, reimbursed the month after receipts are submitted. Gym membership is subsidized up to $100,000 KRW per month. Stock option vesting begins after 1 year of employment, vesting 25% per year over 4 years. Life event allowances include $1,000,000 KRW for marriage, $500,000 KRW for childbirth, and $300,000 KRW for bereavement.",
+        "metadata": { "source": "Total Rewards Guide", "category": "benefits", "last_updated": "2026-01-10" }
+    },
+    {
+        "id": "doc-005",
+        "content": "Expense Policy\n\nTravel expenses may be charged to the company card, including airfare (economy class), lodging (up to $200,000 KRW per night), and meals (up to $50,000 KRW per day). If a corporate card is unavailable, employees may pay personally and submit receipts through the expense system for reimbursement on the following payroll date. Non-recurring purchases over $100,000 KRW (equipment, software subscriptions, etc.) require prior manager approval. Client entertainment expenses are capped at $200,000 KRW per occasion and $500,000 KRW per month, and must include a list of attendees.",
+        "metadata": { "source": "Finance & Expense Guide", "category": "expenses", "last_updated": "2026-02-10" }
+    },
+    {
+        "id": "doc-006",
+        "content": "Code of Conduct\n\nAll employees are expected to treat one another with respect regardless of rank, gender, nationality, or religion. Leaking internal information (unreleased financial results, HR data, source code, etc.) to external parties may result in immediate termination. Potential conflicts of interest involving personal investments, outside employment, or hiring family members must be disclosed to the compliance team in advance. Employees who experience or witness harassment, discrimination, or retaliatory action may report it to HR or through the anonymous reporting channel (ethics@company.com), and reporters are protected from retaliation.",
+        "metadata": {
+            "source": "Code of Conduct Handbook",
+            "category": "code_of_conduct",
+            "last_updated": "2026-01-05"
+        }
+    }
+]
