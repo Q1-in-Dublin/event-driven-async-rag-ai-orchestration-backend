@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 
 from app.db.models import Document 
-
 def search_similar_documents(db: Session, query_embedding: list[float], top_k: int=3 )-> list[Document]:
      return(
           # top k distance .. DSA 
