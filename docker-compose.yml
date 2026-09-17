@@ -14,6 +14,7 @@ services:
 
         volumes:
             - ./app:/app/app
+            - ./tests:/app/tests
 
     redis:
         image: redis:7-alpine
