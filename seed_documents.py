@@ -1,22 +1,21 @@
 """
 seed_documents.py
 
-sample_documents.json을 읽어 embedding을 생성하고 pgvector의 documents 테이블에 적재합니다.
-기술 설계 문서의 documents 테이블 스키마(id, content, embedding, metadata)를 따릅니다.
+Reads docs/seed_documents.json, generates embeddings, and loads them into
+the pgvector-backed documents table.
 
-사용법:
+Usage:
     python seed_documents.py
 """
 
 import json
-import uuid
 from pathlib import Path
 
-# 프로젝트의 rag/embedding.py, db/session.py를 사용한다고 가정
-# from app.rag.embedding import generate_embedding
-# from app.db.session import get_db_session
+from app.db.models import Document
+from app.db.session import SessionLocal
+from app.rag.embedding import generate_embedding
 
-SEED_FILE = Path(__file__).parent / "seed_documents.json"
+SEED_FILE = Path(__file__).parent / "docs" / "seed_documents.json"
 
 
 def load_seed_documents() -> list[dict]:
@@ -26,19 +25,20 @@ def load_seed_documents() -> list[dict]:
 
 def seed():
     documents = load_seed_documents()
-    print(f"{len(documents)} loaded documents in pgvector...")
+    print(f"{len(documents)} documents to load into pgvector...")
 
-    for doc in documents:
-        # embedding = generate_embedding(doc["content"])  # 실제 embedding 모델 호출
-        embedding = [0.0] * 1536  # placeholder — 실제 구현 시 embedding.py 연결 필요
+    db = SessionLocal()
+    try:
+        for doc in documents:
+            embedding = generate_embedding(doc["content"])
+            metadata = {**doc["metadata"], "seed_id": doc["id"]}
+            db.add(Document(content=doc["content"], embedding=embedding, doc_metadata=metadata))
+            print(f"  - [{doc['metadata']['category']}] {doc['id']} queued")
+        db.commit()
+    finally:
+        db.close()
 
-        # db.execute(
-        #     "INSERT INTO documents (id, content, embedding, metadata) VALUES (%s, %s, %s, %s)",
-        #     (str(uuid.uuid4()), doc["content"], embedding, json.dumps(doc["metadata"])),
-        # )
-        print(f"  - [{doc['metadata']['category']}] {doc['id']} 적재 완료 (임시: DB insert 미연결)")
-
-    print("시드 데이터 적재 완료.")
+    print("Seeding complete.")
 
 
 if __name__ == "__main__":
