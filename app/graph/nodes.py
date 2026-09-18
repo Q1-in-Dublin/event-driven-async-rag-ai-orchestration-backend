@@ -5,6 +5,8 @@ from app.rag.vector_search import search_similar_documents
 
 from app.llm.vertex_client import generate_response
 from app.db.models import Request, Result
+from langgraph.graph import END, StateGraph
+
 
 RAG_KEYWORDS = [
     "정책", "규정", "가이드", "휴가", "보안", "복지", "문서",
@@ -64,3 +66,42 @@ def save_result(state:GraphState) -> GraphState:
     finally:
         db.close()
     return state
+
+
+def respond_to_slack(state:GraphState) -> GraphState:
+    # ponytail: mock Slack response — swap for a real call to Slack's
+    # response_url / chat.postMessage once Slack app credentials exist
+    print(f"[mock Slack response] {state['llm_response']}")
+    return state
+
+# Connecting LangGraph State graph
+# integrating as a workflow
+def build_graph():
+    # initiate node and register
+    graph = StateGraph(GraphState)
+    graph.add_node("classify_intent", classify_intent)
+    graph.add_node("embed_query", embed_query)
+    graph.add_node("search_vector_db", search_vector_db)
+    graph.add_node("build_prompt", build_prompt)
+    graph.add_node("call_llm", call_llm)
+    graph.add_node("save_result", save_result)
+    graph.add_node("respond_to_slack", respond_to_slack)
+
+    #starting point
+    graph.set_entry_point("classify_intent")
+    #conditional point
+    graph.add_conditional_edges(
+        "classify_intent",
+        lambda state: "embed_query" if state["needs_rag"] else "build_prompt",
+    )
+    # embed_query -> search_vector_db -> build_prompt
+    graph.add_edge("embed_query", "search_vector_db")
+    graph.add_edge("search_vector_db", "build_prompt")
+    #build_prompt -> call_llm -> save_result
+    graph.add_edge("build_prompt", "call_llm")
+    graph.add_edge("call_llm", "save_result")
+    # save_result -> respond_to_slack-> end
+    graph.add_edge("save_result", "respond_to_slack")
+    graph.add_edge("respond_to_slack", END)
+
+    return graph.compile()
