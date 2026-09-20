@@ -4,10 +4,12 @@
 PRD.md
 TDD.md
 what_I_learnt.md
-
+PORTFOLIO_KR.md
+PORTFOLIO.md
 # Ignore specific directories
 build/
 .serena/
+.claude/
 
 # Python bytecode cache
 __pycache__/
@@ -26,4 +28,4 @@ __pycache__/
 .env
 
 # Use '!' to re-include a specific file that would otherwise be ignored
-!.vscode/tasks.jsonPORTFOLIO_KR.md
+!.vscode/tasks.json
