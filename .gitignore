@@ -26,4 +26,4 @@ __pycache__/
 .env
 
 # Use '!' to re-include a specific file that would otherwise be ignored
-!.vscode/tasks.json
+!.vscode/tasks.jsonPORTFOLIO_KR.md
