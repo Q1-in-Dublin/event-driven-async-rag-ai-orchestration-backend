@@ -129,7 +129,7 @@ sequenceDiagram
 - A single Slack message requires an LLM call that alone takes 3-5 seconds
 - In a synchronous design, the request thread blocks while waiting for the LLM response
 - Slack treats a webhook as timed out if it doesn't respond within 3 seconds and retries the event, risking duplicate processing
-- Throughput degrades linearly as concurrent requests increase — a structural bottleneck
+- Throughput degrades linearly as concurrent requests increase: a structural bottleneck
 
 **Solution**
 - FastAPI saves the Request record to PostgreSQL first, enqueues the message to Redis Streams, then immediately responds with 202 Accepted
@@ -156,7 +156,7 @@ graph LR
 
 **Root Cause**
 - The initial MVP used a simple Redis List (`lpush` / `brpop`) queue
-- With List semantics, a message is deleted the instant it's popped — if the Worker crashes mid-processing, that message is permanently lost
+- With List semantics, a message is deleted the instant it's popped; if the Worker crashes mid-processing, that message is permanently lost
 - Actually encountered a silent failure during development from a duplicate `lpush` call: the API returned 202, but the queue length (LLEN) was found to be 0
 
 **Solution**
@@ -188,7 +188,7 @@ stateDiagram-v2
 ```
 
 **Root Cause**
-- Not every question sent to the internal HR policy Q&A bot requires RAG (document retrieval) — e.g., "Hi" vs. "What's the vacation policy?"
+- Not every question sent to the internal HR policy Q&A bot requires RAG (document retrieval), e.g., "Hi" vs. "What's the vacation policy?"
 - Handling this with plain if/else branching makes code complexity grow exponentially as processing steps increase, and each step becomes hard to test in isolation
 - Responsibilities across embedding, vector search, prompt construction, and LLM calls weren't clearly separated, making the codebase hard to maintain
 
@@ -200,12 +200,12 @@ stateDiagram-v2
 
 **Results**
 - The workflow is expressed as a visualized state graph, so each node can be tested independently
-- New processing steps can be added by adding a node to the graph, without modifying existing nodes — an extensible structure
+- New processing steps can be added by adding a node to the graph, without modifying existing nodes: an extensible structure
 - Verified the RAG path works correctly on real Slack questions ("what's the vacation policy?", "Remote Work?")
 
 ---
 
-### 4. pgvector-Based RAG — From Discovering a Mock Embedding to Verified Retrieval Accuracy
+### 4. pgvector-Based RAG: From Discovering a Mock Embedding to Verified Retrieval Accuracy
 
 ```mermaid
 graph TD
@@ -218,19 +218,19 @@ graph TD
 
 **Root Cause**
 - Keyword-based search can't match semantically identical but differently worded questions, e.g., "vacation policy" vs. "how many days off do I get"
-- **A serious issue found while re-auditing the code**: `generate_embedding()` in `app/rag/embedding.py` wasn't calling a real embedding model at all — it was generating a **hash-seeded random vector** from the input text. Identical text produced identical vectors, but there was no real semantic relationship between vectors for different text — the "semantic search" claim didn't match reality
+- **A serious issue found while re-auditing the code**: `generate_embedding()` in `app/rag/embedding.py` wasn't calling a real embedding model at all: it was generating a **hash-seeded random vector** from the input text. Identical text produced identical vectors, but there was no real semantic relationship between vectors for different text; the "semantic search" claim didn't match reality
 
 **Solution**
 
 While migrating to the Google Vertex AI Text Embedding API, uncovered and fixed three layered root causes in sequence:
 1. **Mock → real embeddings**: wired up `text-embedding-004` (initial attempt, 768 dimensions)
-2. **Discovered missing `task_type`**: without distinguishing document vs. query embeddings via `RETRIEVAL_DOCUMENT` / `RETRIEVAL_QUERY`, search rankings came out nearly identical regardless of the question asked — fixed by passing `TextEmbeddingInput(text, task_type)`
-3. **Discovered a language mismatch**: even after fixing task_type, Korean questions failed to surface the English vacation-policy document at the top. The same question in English worked correctly, isolating the cause to weak cross-lingual performance — solved by switching to `text-multilingual-embedding-002`
+2. **Discovered missing `task_type`**: without distinguishing document vs. query embeddings via `RETRIEVAL_DOCUMENT` / `RETRIEVAL_QUERY`, search rankings came out nearly identical regardless of the question asked; fixed by passing `TextEmbeddingInput(text, task_type)`
+3. **Discovered a language mismatch**: even after fixing task_type, Korean questions failed to surface the English vacation-policy document at the top. The same question in English worked correctly, isolating the cause to weak cross-lingual performance; solved by switching to `text-multilingual-embedding-002`
 
 Also measured the actual cosine distance distribution to empirically derive a distance threshold that filters out unrelated questions (`app/rag/vector_search.py`), and wrote 8 retrieval accuracy tests covering 6 category questions plus 2 unrelated questions (`tests/test_rag_accuracy.py`).
 
 **Results**
-- **8/8 retrieval accuracy tests passing** — e.g. "how many vacation days per year?" → vacation document (cosine distance 0.378, rank #1); "how's the weather today?" → correctly filtered out as no relevant document
+- **8/8 retrieval accuracy tests passing**, e.g. "how many vacation days per year?" → vacation document (cosine distance 0.378, rank #1); "how's the weather today?" → correctly filtered out as no relevant document
 - Achieved semantic search using only the existing PostgreSQL stack, with no additional infrastructure
 - **The debugging process itself is the deliverable**: not "I implemented RAG," but "while verifying it, I discovered and root-caused three layered problems in sequence and fixed each one"
 
@@ -250,7 +250,7 @@ graph LR
 
 **Root Cause**
 - In the initial implementation, anyone could send an arbitrary request to `/slack/events` (no authentication)
-- The result-lookup API (`GET /requests/{id}`) had the same vulnerability — anyone could query results without authentication
+- The result-lookup API (`GET /requests/{id}`) had the same vulnerability: anyone could query results without authentication
 - Comparing tokens with a plain string comparison (`==`) is vulnerable to timing attacks
 
 **Solution**
@@ -268,7 +268,7 @@ graph LR
 
 ### 6. Root-Causing a Flawed Load Test and Redesigning It to Prove Data Integrity
 
-**Attempt 1 (failed) — a parallel script induced a race condition**
+**Attempt 1 (failed): a parallel script induced a race condition**
 ```mermaid
 sequenceDiagram
     participant Script as Load test script
@@ -286,7 +286,7 @@ sequenceDiagram
     Worker->>DB: marks status='failed'
 ```
 
-**Attempt 2 (redesigned) — hitting the real API endpoint through its normal path**
+**Attempt 2 (redesigned): hitting the real API endpoint through its normal path**
 ```mermaid
 sequenceDiagram
     participant LT as load_test_api.py<br/>(asyncio, N concurrent)
@@ -306,12 +306,12 @@ sequenceDiagram
 **Root Cause**
 - To validate queue stability, first wrote a load test script that pushed 200 messages into Redis and PostgreSQL simultaneously via parallel `docker exec ... redis-cli XADD ... &` and `docker exec ... psql INSERT ... &` background jobs
 - This caused a timing mismatch between when each store's write actually completed
-- As a result, all 200 messages landed in Redis, but only 25 request records were saved to PostgreSQL (175 lost) — the Worker read messages from Redis, generated LLM responses, but hit foreign key violations saving results because the matching `request_id` didn't exist in `requests`
+- As a result, all 200 messages landed in Redis, but only 25 request records were saved to PostgreSQL (175 lost); the Worker read messages from Redis, generated LLM responses, but hit foreign key violations saving results because the matching `request_id` didn't exist in `requests`
 
 **Solution**
 - Pinpointed the failure as an FK violation using Worker logs and a DB query grouped by `status`
 - Proved it was a race condition with data: compared the message count in Redis (200) against the request record count in the DB (25)
-- Confirmed the real Slack flow (FastAPI saves to DB, then enqueues to Redis, synchronously in sequence) is unaffected — establishing that the root cause was **the test script's parallel design**, not the system architecture
+- Confirmed the real Slack flow (FastAPI saves to DB, then enqueues to Redis, synchronously in sequence) is unaffected, establishing that the root cause was **the test script's parallel design**, not the system architecture
 - **Wrote `load_test_api.py`**: computed a real HMAC-SHA256 signature using the Slack Signing Secret, then used `httpx` + `asyncio.gather` to fire concurrent requests at the actual `POST /slack/events` endpoint, exercising the exact same code path real Slack traffic uses
 - Re-validated in stages at 50 and 200 concurrent requests
 
@@ -343,7 +343,7 @@ sequenceDiagram
 
 ## Results
 
-✅ **Complete E2E System Working** — Slack → Gemini AI → Slack (Real-time)
+✅ **Complete E2E System Working**: Slack → Gemini AI → Slack (Real-time)
 ✅ **9/9 API tests + 8/8 RAG retrieval accuracy tests passing**
 ✅ **200 concurrent requests → 100% saved, 0% loss (p99 395ms)**
 ✅ **Production-Ready**
