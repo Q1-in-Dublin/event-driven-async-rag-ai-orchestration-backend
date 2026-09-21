@@ -177,9 +177,8 @@ graph LR
 ```mermaid
 stateDiagram-v2
     [*] --> ClassifyIntent
-    ClassifyIntent --> Decision{Needs RAG?}
-    Decision -->|Yes| EmbedQuery
-    Decision -->|No| BuildPrompt
+    ClassifyIntent --> EmbedQuery: needs RAG
+    ClassifyIntent --> BuildPrompt: no RAG needed
     EmbedQuery --> SearchVectorDB
     SearchVectorDB --> BuildPrompt
     BuildPrompt --> CallLLM
