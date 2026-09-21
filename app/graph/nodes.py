@@ -6,6 +6,8 @@ from app.rag.vector_search import search_similar_documents
 from app.llm.vertex_client import generate_response
 from app.db.models import Request, Result
 from langgraph.graph import END, StateGraph
+from slack_sdk import WebClient
+from app.config import settings
 
 
 RAG_KEYWORDS = [
@@ -68,10 +70,25 @@ def save_result(state:GraphState) -> GraphState:
     return state
 
 
-def respond_to_slack(state:GraphState) -> GraphState:
-    # ponytail: mock Slack response — swap for a real call to Slack's
-    # response_url / chat.postMessage once Slack app credentials exist
-    print(f"[mock Slack response] {state['llm_response']}")
+def respond_to_slack(state: GraphState) -> GraphState:
+    print(f"[DEBUG] respond_to_slack called with channel_id={state.get('channel_id')}")
+    try:
+        client = WebClient(token=settings.slack_bot_token)
+        channel_id = state.get("channel_id")
+        user_id = state.get("user_id")
+        response = state["llm_response"]
+
+        if channel_id:
+            text = f"<@{user_id}> {response}"
+            client.chat_postMessage(channel=channel_id, text=text)
+            print(f"[Slack] Sent message to {channel_id}")
+        else:
+            print(f"[DEBUG] No channel_id in state")
+    except Exception as e:
+        print(f"[Slack Error] Failed to send message: {e}")
+        import traceback
+        traceback.print_exc()
+
     return state
 
 # Connecting LangGraph State graph

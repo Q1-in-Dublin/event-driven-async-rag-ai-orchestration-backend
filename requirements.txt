@@ -8,3 +8,5 @@ langgraph
 pydantic-settings
 pytest
 httpx
+slack-sdk
+google-cloud-aiplatform

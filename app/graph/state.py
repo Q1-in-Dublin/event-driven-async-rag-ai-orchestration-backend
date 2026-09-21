@@ -2,6 +2,8 @@ from typing import TypedDict
 
 class GraphState(TypedDict, total=False):
     request_id : str
+    user_id: str
+    channel_id: str
     user_text : str
     needs_rag : bool
     query_embedding: list[float]
