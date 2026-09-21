@@ -34,12 +34,14 @@ Slack (response delivered)
 ## Status: Complete ✅
 
 **Phase 1: Event-Driven Pipeline**
+
 - ✅ FastAPI with async handlers
 - ✅ Redis Streams (consumer groups, XACK for at-least-once delivery)
 - ✅ PostgreSQL with pgvector
 - ✅ LangGraph state machine with conditional branching
 
 **Phase 2: Production Hardening (All Done!)**
+
 - ✅ Slack webhook signature verification (HMAC-SHA256 + timestamp validation)
 - ✅ API Key authentication (Bearer token with timing-attack protection)
 - ✅ Real Slack integration via webhook
@@ -53,16 +55,16 @@ Slack (response delivered)
 
 ## Tech Stack
 
-| Layer | Choice | Why |
-|-------|--------|-----|
-| API | FastAPI | Modern async Python framework with automatic docs |
-| Queue | Redis Streams | Consumer groups + XACK = zero message loss |
-| Orchestration | LangGraph | Explicit state graphs for complex workflows |
-| Vector DB | pgvector | Semantic search inside PostgreSQL (no external deps) |
-| LLM | Gemini 3.5 Flash | Real Vertex AI integration |
-| Security | HMAC + API Key | Webhook verification + internal endpoint protection |
-| Tests | pytest | 9 automated tests (unit + integration) |
-| Local Stack | Docker Compose | FastAPI + Redis + PostgreSQL (complete dev environment) |
+| Layer         | Choice           | Why                                                     |
+| ------------- | ---------------- | ------------------------------------------------------- |
+| API           | FastAPI          | Modern async Python framework with automatic docs       |
+| Queue         | Redis Streams    | Consumer groups + XACK = zero message loss              |
+| Orchestration | LangGraph        | Explicit state graphs for complex workflows             |
+| Vector DB     | pgvector         | Semantic search inside PostgreSQL (no external deps)    |
+| LLM           | Gemini 3.5 Flash | Real Agent Platform integration                         |
+| Security      | HMAC + API Key   | Webhook verification + internal endpoint protection     |
+| Tests         | pytest           | 9 automated tests (unit + integration)                  |
+| Local Stack   | Docker Compose   | FastAPI + Redis + PostgreSQL (complete dev environment) |
 
 ---
 
@@ -122,7 +124,3 @@ docker-compose.yml       # Local stack
 ✅ **9/9 Tests Passing**  
 ✅ **590 Lines of Code (Efficient)**  
 ✅ **Production-Ready**
-
----
-
-See [PORTFOLIO.md](PORTFOLIO.md) for problem-solving journey and design rationale.
