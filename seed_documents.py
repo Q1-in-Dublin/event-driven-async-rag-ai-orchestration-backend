@@ -29,7 +29,15 @@ def seed():
 
     db = SessionLocal()
     try:
+        existing_seed_ids = {
+            doc.doc_metadata.get("seed_id")
+            for doc in db.query(Document).all()
+            if doc.doc_metadata
+        }
         for doc in documents:
+            if doc["id"] in existing_seed_ids:
+                print(f"  - [{doc['metadata']['category']}] {doc['id']} already seeded, skipping")
+                continue
             embedding = generate_embedding(doc["content"])
             metadata = {**doc["metadata"], "seed_id": doc["id"]}
             db.add(Document(content=doc["content"], embedding=embedding, doc_metadata=metadata))

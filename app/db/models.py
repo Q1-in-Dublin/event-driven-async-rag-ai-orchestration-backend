@@ -42,5 +42,5 @@ class Document(Base):
     __tablename__ = "documents"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     content = Column(Text, nullable=False)
-    embedding = Column(Vector(1536), nullable= False)
+    embedding = Column(Vector(768), nullable= False)
     doc_metadata = Column("metadata", JSONB, nullable = True)

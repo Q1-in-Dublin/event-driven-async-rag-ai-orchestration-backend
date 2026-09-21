@@ -54,6 +54,10 @@ def worker_loop():
             print(f"Request {request_id} completed")
         except Exception as e:
             print(f"Error processing request {request_id}: {e}")
+            # a failed query leaves the session's transaction aborted; without
+            # rolling back, the status update below fails too and crashes the
+            # worker process instead of just marking this request failed
+            db.rollback()
             request = db.query(Request).filter(Request.id == request_id).first()
             if request:
                 request.status = "failed"

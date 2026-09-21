@@ -48,7 +48,7 @@ class TestSlackSignatureVerification:
                 "Content-Type": "application/json"
             }
         )
-        assert response.status_code == 200
+        assert response.status_code == 202
 
     def test_slack_events_invalid_signature(self):
         """잘못된 서명 → 401 Unauthorized"""

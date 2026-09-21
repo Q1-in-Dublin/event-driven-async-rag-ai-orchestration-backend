@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, Request, HTTPException, status, Header
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 import json
 import uuid
@@ -77,7 +78,10 @@ async def slack_events(request: Request, db: Session = Depends(get_db)):
             raise HTTPException(status_code=500, detail="Failed to process request")
 
         # 202 Accepted (return immediately, process in background)
-        return {"ok": True, "request_id": request_id}
+        return JSONResponse(
+            status_code=status.HTTP_202_ACCEPTED,
+            content={"ok": True, "request_id": request_id},
+        )
 
     return {"ok": True}
 

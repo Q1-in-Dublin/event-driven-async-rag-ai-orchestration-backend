@@ -20,7 +20,7 @@ def classify_intent(state:GraphState) ->GraphState:
     return {**state, "needs_rag": needs_rag}
 
 def embed_query(state: GraphState) -> GraphState:
-    embedding = generate_embedding(state["user_text"])
+    embedding = generate_embedding(state["user_text"], task_type="RETRIEVAL_QUERY")
     return {**state, "query_embedding": embedding}
 
 def search_vector_db(state: GraphState) -> GraphState:
